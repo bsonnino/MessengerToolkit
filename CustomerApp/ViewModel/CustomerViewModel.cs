@@ -1,15 +1,20 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using CustomerLib;
+using System;
 
 namespace CustomerApp.ViewModel
 {
     public partial class CustomerViewModel : ObservableObject
     {
         private readonly Customer _customer;
+        private readonly IMessenger messenger;
 
         public CustomerViewModel(Customer customer)
         {
+            if (customer == null)
+                throw new ArgumentNullException("customer");
             _customer = customer;
             CustomerId = _customer.CustomerId;
             CompanyName = _customer.CompanyName;
@@ -24,39 +29,39 @@ namespace CustomerApp.ViewModel
             Fax = _customer.Fax;
         }
 
-        [ObservableProperty] 
+        [ObservableProperty]
         private string _customerId;
-        [ObservableProperty] 
+        [ObservableProperty]
         private string _companyName;
-        [ObservableProperty] 
+        [ObservableProperty]
         private string _contactName;
-        [ObservableProperty] 
+        [ObservableProperty]
         private string _contactTitle;
-        [ObservableProperty] 
+        [ObservableProperty]
         private string _address;
-        [ObservableProperty] 
+        [ObservableProperty]
         private string _city;
-        [ObservableProperty] 
+        [ObservableProperty]
         private string _region;
-        [ObservableProperty] 
+        [ObservableProperty]
         private string _postalCode;
-        [ObservableProperty] 
+        [ObservableProperty]
         private string _country;
-        [ObservableProperty] 
+        [ObservableProperty]
         private string _phone;
-        [ObservableProperty] 
+        [ObservableProperty]
         private string _fax;
 
         [RelayCommand]
         private void Delete()
         {
-
+            WeakReferenceMessenger.Default.Send(new ViewModelDeletedMessage(this));
         }
 
         [RelayCommand]
         private void Closing()
         {
-
+            WeakReferenceMessenger.Default.Send(new WindowClosedMessage(this));
         }
     }
 }

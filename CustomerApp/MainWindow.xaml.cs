@@ -11,6 +11,5 @@
             InitializeComponent();
             DataContext = App.Current.MainVM;
         }
-
     }
 }

@@ -1,18 +1,40 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows.Data;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Mvvm.Messaging.Messages;
 using CustomerApp.Services;
 using CustomerLib;
 
 namespace CustomerApp.ViewModel
 {
+    public class WindowClosedMessage: ValueChangedMessage<CustomerViewModel>
+    {
+        public WindowClosedMessage(CustomerViewModel vm) : base(vm)
+        {
+
+        }
+    }
+
+    public class ViewModelDeletedMessage : ValueChangedMessage<CustomerViewModel>
+    {
+        public ViewModelDeletedMessage(CustomerViewModel vm) : base(vm)
+        {
+
+        }
+    }
+
     public partial class MainViewModel : ObservableObject
     {
         private readonly ICustomerRepository _customerRepository;
         private readonly INavigationService _navigationService;
+
+        [ObservableProperty]
+        private ObservableCollection<CustomerViewModel> _openWindows = new ObservableCollection<CustomerViewModel>();
         
         public MainViewModel(ICustomerRepository customerRepository, INavigationService navigationService)
         {
@@ -21,6 +43,26 @@ namespace CustomerApp.ViewModel
             Customers = new ObservableCollection<CustomerViewModel>(
                 _customerRepository.Customers.Select(c => new CustomerViewModel(c)));
             _navigationService = navigationService;
+            WeakReferenceMessenger.Default.Register<WindowClosedMessage>(this, (r, m) =>
+            {
+                WindowCount--;
+                _openWindows.Remove(m.Value);
+            });
+            WeakReferenceMessenger.Default.Register<ViewModelDeletedMessage>(this, (r, m) =>
+            {
+                DeleteCustomer(m.Value);
+            });
+        }
+
+        private void DeleteCustomer(CustomerViewModel vm)
+        {
+            Customers.Remove(vm);
+            var deletedCustomer = _customerRepository.Customers.FirstOrDefault(c => c.CustomerId == vm.CustomerId);
+            if (deletedCustomer != null)
+            {
+                _customerRepository.Remove(deletedCustomer);
+            }
+            _navigationService.Close(vm);
         }
 
         [ObservableProperty]
@@ -60,6 +102,7 @@ namespace CustomerApp.ViewModel
         {
             _navigationService.Navigate(vm);
             WindowCount++;
+            _openWindows.Add(vm);
         }
     }
 }

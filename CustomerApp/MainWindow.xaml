@@ -1,42 +1,126 @@
-﻿<Window x:Class="CustomerApp.MainWindow" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="MainWindow" Height="689" Width="1046">
+﻿<Window x:Class="CustomerApp.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MainWindow"
+        Height="689"
+        Width="1246">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="40" />
             <RowDefinition Height="*" />
             <RowDefinition Height="50" />
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="200" />
+        </Grid.ColumnDefinitions>
         <StackPanel Orientation="Horizontal">
-            <TextBlock Text="Country" VerticalAlignment="Center" Margin="5" />
-            <TextBox x:Name="searchText" VerticalAlignment="Center" Margin="5,3" Width="250" Height="25" VerticalContentAlignment="Center" />
-            <Button x:Name="PesqBtn" Content="Find" Width="75" Height="25" Margin="10,5" VerticalAlignment="Center" Command="{Binding SearchCommand}" CommandParameter="{Binding ElementName=searchText,Path=Text}" />
+            <TextBlock Text="Country"
+                       VerticalAlignment="Center"
+                       Margin="5" />
+            <TextBox x:Name="searchText"
+                     VerticalAlignment="Center"
+                     Margin="5,3"
+                     Width="250"
+                     Height="25"
+                     VerticalContentAlignment="Center" />
+            <Button x:Name="PesqBtn"
+                    Content="Find"
+                    Width="75"
+                    Height="25"
+                    Margin="10,5"
+                    VerticalAlignment="Center"
+                    Command="{Binding SearchCommand}"
+                    CommandParameter="{Binding ElementName=searchText,Path=Text}" />
         </StackPanel>
-        <DataGrid AutoGenerateColumns="False" x:Name="master" CanUserAddRows="False" CanUserDeleteRows="True" Grid.Row="1" ItemsSource="{Binding Customers}" RowHeight="22" AlternatingRowBackground="AliceBlue" VerticalGridLinesBrush="#b0b0b0" HorizontalGridLinesBrush="#b0b0b0">
+        <DataGrid AutoGenerateColumns="False"
+                  x:Name="master"
+                  CanUserAddRows="False"
+                  CanUserDeleteRows="True"
+                  Grid.Row="1"
+                  ItemsSource="{Binding Customers}"
+                  RowHeight="22"
+                  AlternatingRowBackground="AliceBlue"
+                  VerticalGridLinesBrush="#b0b0b0"
+                  HorizontalGridLinesBrush="#b0b0b0">
             <DataGrid.Columns>
-                <DataGridTextColumn x:Name="customerIDColumn" Binding="{Binding Path=CustomerId}" Header="Customer ID" Width="60" />
-                <DataGridTextColumn x:Name="companyNameColumn" Binding="{Binding Path=CompanyName}" Header="Company Name" Width="160" />
-                <DataGridTextColumn x:Name="contactNameColumn" Binding="{Binding Path=ContactName}" Header="Contact Name" Width="160" />
-                <DataGridTextColumn x:Name="contactTitleColumn" Binding="{Binding Path=ContactTitle}" Header="Contact Title" Width="60" />
-                <DataGridTextColumn x:Name="addressColumn" Binding="{Binding Path=Address}" Header="Address" Width="130" />
-                <DataGridTextColumn x:Name="cityColumn" Binding="{Binding Path=City}" Header="City" Width="60" />
-                <DataGridTextColumn x:Name="postalCodeColumn" Binding="{Binding Path=PostalCode}" Header="Postal Code" Width="50" />
-                <DataGridTextColumn x:Name="countryColumn" Binding="{Binding Path=Country}" Header="Country" Width="80" />
-                <DataGridTextColumn x:Name="faxColumn" Binding="{Binding Path=Fax}" Header="Fax" Width="100" />
-                <DataGridTextColumn x:Name="phoneColumn" Binding="{Binding Path=Phone}" Header="Phone" Width="100" />
+                <DataGridTextColumn x:Name="customerIDColumn"
+                                    Binding="{Binding Path=CustomerId}"
+                                    Header="Customer ID"
+                                    Width="60" />
+                <DataGridTextColumn x:Name="companyNameColumn"
+                                    Binding="{Binding Path=CompanyName}"
+                                    Header="Company Name"
+                                    Width="160" />
+                <DataGridTextColumn x:Name="contactNameColumn"
+                                    Binding="{Binding Path=ContactName}"
+                                    Header="Contact Name"
+                                    Width="160" />
+                <DataGridTextColumn x:Name="contactTitleColumn"
+                                    Binding="{Binding Path=ContactTitle}"
+                                    Header="Contact Title"
+                                    Width="60" />
+                <DataGridTextColumn x:Name="addressColumn"
+                                    Binding="{Binding Path=Address}"
+                                    Header="Address"
+                                    Width="130" />
+                <DataGridTextColumn x:Name="cityColumn"
+                                    Binding="{Binding Path=City}"
+                                    Header="City"
+                                    Width="60" />
+                <DataGridTextColumn x:Name="postalCodeColumn"
+                                    Binding="{Binding Path=PostalCode}"
+                                    Header="Postal Code"
+                                    Width="50" />
+                <DataGridTextColumn x:Name="countryColumn"
+                                    Binding="{Binding Path=Country}"
+                                    Header="Country"
+                                    Width="80" />
+                <DataGridTextColumn x:Name="faxColumn"
+                                    Binding="{Binding Path=Fax}"
+                                    Header="Fax"
+                                    Width="100" />
+                <DataGridTextColumn x:Name="phoneColumn"
+                                    Binding="{Binding Path=Phone}"
+                                    Header="Phone"
+                                    Width="100" />
                 <DataGridTemplateColumn>
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Command="{Binding DataContext.ShowDetailsCommand, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" ToolTip="Details">
-                                <TextBlock Text="" FontFamily="Segoe UI Symbol" />
+                            <Button Command="{Binding DataContext.ShowDetailsCommand, 
+                                RelativeSource={RelativeSource AncestorType=Window}}"
+                                    CommandParameter="{Binding}"
+                                    ToolTip="Details">
+                                <TextBlock Text=""
+                                           FontFamily="Segoe UI Symbol" />
                             </Button>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </DataGrid.Columns>
         </DataGrid>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="5" Grid.Row="3">
-            <Button Width="75" Height="25" Margin="5" Content="Add" Command="{Binding AddCommand}" />
-            <Button Width="75" Height="25" Margin="5" Content="Save" Command="{Binding SaveCommand}" />
+        <StackPanel Orientation="Horizontal"
+                    HorizontalAlignment="Right"
+                    Margin="5"
+                    Grid.Row="3">
+            <Button Width="75"
+                    Height="25"
+                    Margin="5"
+                    Content="Add"
+                    Command="{Binding AddCommand}" />
+            <Button Width="75"
+                    Height="25"
+                    Margin="5"
+                    Content="Save"
+                    Command="{Binding SaveCommand}" />
         </StackPanel>
-        <TextBlock Text="{Binding WindowCount, StringFormat=Open Windows: {0}}" Grid.Row="3" Margin="5"/>
+        <TextBlock Text="{Binding WindowCount, StringFormat=Open Windows: {0}}"
+                   Grid.Row="3"
+                   Margin="5" />
+        <ListBox Grid.Column="1"
+                 Grid.Row="1"
+                 Margin="5,0"
+                 ItemsSource="{Binding OpenWindows, Mode=OneWay}"
+                 DisplayMemberPath="CustomerId" />
     </Grid>
 </Window>
