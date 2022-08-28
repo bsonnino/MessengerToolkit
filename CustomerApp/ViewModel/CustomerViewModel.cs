@@ -9,12 +9,15 @@ namespace CustomerApp.ViewModel
     public partial class CustomerViewModel : ObservableObject
     {
         private readonly Customer _customer;
-        private readonly IMessenger messenger;
+        private readonly IMessenger _messenger;
 
-        public CustomerViewModel(Customer customer)
+        public CustomerViewModel(Customer customer, IMessenger messenger)
         {
             if (customer == null)
                 throw new ArgumentNullException("customer");
+            if (messenger == null)
+                throw new ArgumentNullException("messenger");
+            _messenger = messenger;
             _customer = customer;
             CustomerId = _customer.CustomerId;
             CompanyName = _customer.CompanyName;
@@ -55,13 +58,13 @@ namespace CustomerApp.ViewModel
         [RelayCommand]
         private void Delete()
         {
-            WeakReferenceMessenger.Default.Send(new ViewModelDeletedMessage(this));
+            _messenger.Send(new ViewModelDeletedMessage(this));
         }
 
         [RelayCommand]
         private void Closing()
         {
-            WeakReferenceMessenger.Default.Send(new WindowClosedMessage(this));
+            _messenger.Send(new WindowClosedMessage(this));
         }
     }
 }

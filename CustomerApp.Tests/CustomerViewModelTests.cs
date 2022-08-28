@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.Messaging;
 using CustomerApp.ViewModel;
 using CustomerLib;
+using FakeItEasy;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -15,7 +16,7 @@ namespace CustomerApp.Tests
         [TestMethod]
         public void Constructor_NullCustomer_ShouldThrow()
         {
-            Action act = () => new CustomerViewModel(null);
+            Action act = () => new CustomerViewModel(null,null);
 
             act.Should().Throw<ArgumentNullException>()
                 .Where(e => e.Message.Contains("customer"));
@@ -25,7 +26,8 @@ namespace CustomerApp.Tests
         public void Constructor_ShouldSetFields()
         {
             var customer = AutoFaker.Generate<Customer>();
-            var customerVM = new CustomerViewModel(customer);
+            var messenger = A.Fake<IMessenger>();
+            var customerVM = new CustomerViewModel(customer, messenger);
             customerVM.CustomerId.Should().Be(customer.CustomerId);
             customerVM.CompanyName.Should().Be(customer.CompanyName);
             customerVM.ContactName.Should().Be(customer.ContactName);
@@ -43,7 +45,8 @@ namespace CustomerApp.Tests
         public void DeleteCommand_ShouldSendMessageWithVM()
         {
             var customer = AutoFaker.Generate<Customer>();
-            var customerVM = new CustomerViewModel(customer);
+            var messenger = WeakReferenceMessenger.Default;
+            var customerVM = new CustomerViewModel(customer, messenger);
             object callbackResponse = null;
             var waitEvent = new AutoResetEvent(false);
             WeakReferenceMessenger.Default.Register<ViewModelDeletedMessage>(this, (r, m) =>
@@ -60,7 +63,8 @@ namespace CustomerApp.Tests
         public void CloseCommand_ShouldSendMessageWithVM()
         {
             var customer = AutoFaker.Generate<Customer>();
-            var customerVM = new CustomerViewModel(customer);
+            var messenger = WeakReferenceMessenger.Default;
+            var customerVM = new CustomerViewModel(customer, messenger);
             object callbackResponse = null;
             var waitEvent = new AutoResetEvent(false);
             WeakReferenceMessenger.Default.Register<WindowClosedMessage>(this, (r, m) =>

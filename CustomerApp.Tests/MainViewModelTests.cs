@@ -1,5 +1,6 @@
 using System;
 using System.Windows.Data;
+using CommunityToolkit.Mvvm.Messaging;
 using CustomerApp.Services;
 using CustomerApp.ViewModel;
 using CustomerLib;
@@ -15,10 +16,29 @@ namespace CustomerApp.Tests
         [TestMethod]
         public void Constructor_NullRepository_ShouldThrow()
         {
-            Action act = () => new MainViewModel(null, null);
+            Action act = () => new MainViewModel(null, null, null);
 
             act.Should().Throw<ArgumentNullException>()
                 .Where(e => e.Message.Contains("customerRepository"));
+        }
+
+        [TestMethod]
+        public void Constructor_NullNavigationService_ShouldThrow()
+        {
+            Action act = () => new MainViewModel(A.Fake<ICustomerRepository>(), null, null);
+
+            act.Should().Throw<ArgumentNullException>()
+                .Where(e => e.Message.Contains("navigationService"));
+        }
+
+        [TestMethod]
+        public void Constructor_NullMessenger_ShouldThrow()
+        {
+            Action act = () => new MainViewModel(A.Fake<ICustomerRepository>(),
+                A.Fake<INavigationService>(), null);
+
+            act.Should().Throw<ArgumentNullException>()
+                .Where(e => e.Message.Contains("messenger"));
         }
 
         [TestMethod]
@@ -26,9 +46,10 @@ namespace CustomerApp.Tests
         {
             var repository = A.Fake<ICustomerRepository>();
             var navigationService = A.Fake<INavigationService>();
+            var messenger = A.Fake<IMessenger>();
             var customers = A.CollectionOfFake<Customer>(10);
             A.CallTo(() => repository.Customers).Returns(customers);
-            var vm = new MainViewModel(repository, navigationService);
+            var vm = new MainViewModel(repository, navigationService, messenger);
 
             vm.Customers.Count.Should().Be(customers.Count);
         }
@@ -38,9 +59,10 @@ namespace CustomerApp.Tests
         {
             var repository = A.Fake<ICustomerRepository>();
             var navigationService = A.Fake<INavigationService>();
+            var messenger = A.Fake<IMessenger>();
             var customers = A.CollectionOfFake<Customer>(10);
             A.CallTo(() => repository.Customers).Returns(customers);
-            var vm = new MainViewModel(repository, navigationService);
+            var vm = new MainViewModel(repository, navigationService, messenger);
             vm.AddCommand.Execute(null);
             A.CallTo(() => repository.Add(A<Customer>._)).MustHaveHappened();
         }
@@ -50,9 +72,10 @@ namespace CustomerApp.Tests
         {
             var repository = A.Fake<ICustomerRepository>();
             var navigationService = A.Fake<INavigationService>();
+            var messenger = A.Fake<IMessenger>();
             var customers = A.CollectionOfFake<Customer>(10);
             A.CallTo(() => repository.Customers).Returns(customers);
-            var vm = new MainViewModel(repository, navigationService);
+            var vm = new MainViewModel(repository, navigationService, messenger);
             vm.AddCommand.Execute(null);
             vm.Customers.Count.Should().Be(11);
         }
@@ -62,9 +85,10 @@ namespace CustomerApp.Tests
         {
             var repository = A.Fake<ICustomerRepository>();
             var navigationService = A.Fake<INavigationService>();
+            var messenger = A.Fake<IMessenger>();
             var customers = A.CollectionOfFake<Customer>(10);
             A.CallTo(() => repository.Customers).Returns(customers);
-            var vm = new MainViewModel(repository, navigationService);
+            var vm = new MainViewModel(repository, navigationService, messenger);
             vm.AddCommand.Execute(null);
             A.CallTo(() => navigationService.Navigate(A<CustomerViewModel>.Ignored)).MustHaveHappened();
         }
@@ -74,7 +98,8 @@ namespace CustomerApp.Tests
         {
             var repository = A.Fake<ICustomerRepository>();
             var navigationService = A.Fake<INavigationService>();
-            var vm = new MainViewModel(repository, navigationService);
+            var messenger = A.Fake<IMessenger>();
+            var vm = new MainViewModel(repository, navigationService, messenger);
             vm.SaveCommand.Execute(null);
             A.CallTo(() => repository.Commit()).MustHaveHappened();
         }
@@ -84,9 +109,10 @@ namespace CustomerApp.Tests
         {
             var repository = A.Fake<ICustomerRepository>();
             var navigationService = A.Fake<INavigationService>();
+            var messenger = A.Fake<IMessenger>();
             var customers = A.CollectionOfFake<Customer>(10);
             A.CallTo(() => repository.Customers).Returns(customers);
-            var vm = new MainViewModel(repository, navigationService);
+            var vm = new MainViewModel(repository, navigationService, messenger);
             vm.SearchCommand.Execute("text");
             var coll = CollectionViewSource.GetDefaultView(vm.Customers);
             coll.Filter.Should().NotBeNull();
@@ -97,9 +123,10 @@ namespace CustomerApp.Tests
         {
             var repository = A.Fake<ICustomerRepository>();
             var navigationService = A.Fake<INavigationService>();
+            var messenger = A.Fake<IMessenger>();
             var customers = A.CollectionOfFake<Customer>(10);
             A.CallTo(() => repository.Customers).Returns(customers);
-            var vm = new MainViewModel(repository, navigationService);
+            var vm = new MainViewModel(repository, navigationService, messenger);
             vm.SearchCommand.Execute("");
             var coll = CollectionViewSource.GetDefaultView(vm.Customers);
             coll.Filter.Should().BeNull();
@@ -110,9 +137,10 @@ namespace CustomerApp.Tests
         {
             var repository = A.Fake<ICustomerRepository>();
             var navigationService = A.Fake<INavigationService>();
+            var messenger = A.Fake<IMessenger>();
             var customers = A.CollectionOfFake<Customer>(10);
             A.CallTo(() => repository.Customers).Returns(customers);
-            var vm = new MainViewModel(repository, navigationService);
+            var vm = new MainViewModel(repository, navigationService, messenger);
             CustomerViewModel customerVM = vm.Customers[1];
             vm.ShowDetailsCommand.Execute(customerVM);
             A.CallTo(() => navigationService.Navigate(customerVM)).MustHaveHappened();
@@ -123,9 +151,10 @@ namespace CustomerApp.Tests
         {
             var repository = A.Fake<ICustomerRepository>();
             var navigationService = A.Fake<INavigationService>();
+            var messenger = A.Fake<IMessenger>();
             var customers = A.CollectionOfFake<Customer>(10);
             A.CallTo(() => repository.Customers).Returns(customers);
-            var vm = new MainViewModel(repository, navigationService);
+            var vm = new MainViewModel(repository, navigationService, messenger);
             CustomerViewModel customerVM = vm.Customers[1];
             vm.ShowDetailsCommand.Execute(customerVM);
             vm.WindowCount.Should().Be(1);
@@ -136,9 +165,10 @@ namespace CustomerApp.Tests
         {
             var repository = A.Fake<ICustomerRepository>();
             var navigationService = A.Fake<INavigationService>();
+            var messenger = A.Fake<IMessenger>();
             var customers = A.CollectionOfFake<Customer>(10);
             A.CallTo(() => repository.Customers).Returns(customers);
-            var vm = new MainViewModel(repository, navigationService);
+            var vm = new MainViewModel(repository, navigationService, messenger);
             CustomerViewModel customerVM = vm.Customers[1];
             vm.ShowDetailsCommand.Execute(customerVM);
             vm.OpenWindows.Count.Should().Be(1);
@@ -150,9 +180,10 @@ namespace CustomerApp.Tests
         {
             var repository = A.Fake<ICustomerRepository>();
             var navigationService = A.Fake<INavigationService>();
+            var messenger = WeakReferenceMessenger.Default;
             var customers = A.CollectionOfFake<Customer>(10);
             A.CallTo(() => repository.Customers).Returns(customers);
-            var vm = new MainViewModel(repository, navigationService);
+            var vm = new MainViewModel(repository, navigationService, messenger);
             CustomerViewModel customerVM = vm.Customers[1];
             vm.ShowDetailsCommand.Execute(customerVM);
             customerVM.ClosingCommand.Execute(null);
@@ -164,9 +195,10 @@ namespace CustomerApp.Tests
         {
             var repository = A.Fake<ICustomerRepository>();
             var navigationService = A.Fake<INavigationService>();
+            var messenger = WeakReferenceMessenger.Default;
             var customers = A.CollectionOfFake<Customer>(10);
             A.CallTo(() => repository.Customers).Returns(customers);
-            var vm = new MainViewModel(repository, navigationService);
+            var vm = new MainViewModel(repository, navigationService, messenger);
             CustomerViewModel customerVM = vm.Customers[1];
             vm.ShowDetailsCommand.Execute(customerVM);
             customerVM.ClosingCommand.Execute(null);
@@ -178,9 +210,10 @@ namespace CustomerApp.Tests
         {
             var repository = A.Fake<ICustomerRepository>();
             var navigationService = A.Fake<INavigationService>();
+            var messenger = WeakReferenceMessenger.Default;
             var customers = A.CollectionOfFake<Customer>(10);
             A.CallTo(() => repository.Customers).Returns(customers);
-            var vm = new MainViewModel(repository, navigationService);
+            var vm = new MainViewModel(repository, navigationService, messenger);
             CustomerViewModel customerVM = vm.Customers[1];
             vm.ShowDetailsCommand.Execute(customerVM);
             customerVM.DeleteCommand.Execute(null);
@@ -192,9 +225,10 @@ namespace CustomerApp.Tests
         {
             var repository = A.Fake<ICustomerRepository>();
             var navigationService = A.Fake<INavigationService>();
+            var messenger = WeakReferenceMessenger.Default;
             var customers = A.CollectionOfFake<Customer>(10);
             A.CallTo(() => repository.Customers).Returns(customers);
-            var vm = new MainViewModel(repository, navigationService);
+            var vm = new MainViewModel(repository, navigationService, messenger);
             CustomerViewModel customerVM = vm.Customers[1];
             vm.ShowDetailsCommand.Execute(customerVM);
             customerVM.DeleteCommand.Execute(null);
@@ -207,9 +241,10 @@ namespace CustomerApp.Tests
         {
             var repository = A.Fake<ICustomerRepository>();
             var navigationService = A.Fake<INavigationService>();
+            var messenger = WeakReferenceMessenger.Default;
             var customers = A.CollectionOfFake<Customer>(10);
             A.CallTo(() => repository.Customers).Returns(customers);
-            var vm = new MainViewModel(repository, navigationService);
+            var vm = new MainViewModel(repository, navigationService, messenger);
             CustomerViewModel customerVM = vm.Customers[1];
             vm.ShowDetailsCommand.Execute(customerVM);
             customerVM.DeleteCommand.Execute(null);

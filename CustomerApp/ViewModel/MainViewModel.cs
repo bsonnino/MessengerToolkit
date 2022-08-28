@@ -32,23 +32,29 @@ namespace CustomerApp.ViewModel
     {
         private readonly ICustomerRepository _customerRepository;
         private readonly INavigationService _navigationService;
+        private readonly IMessenger _messenger;
 
         [ObservableProperty]
         private ObservableCollection<CustomerViewModel> _openWindows = new ObservableCollection<CustomerViewModel>();
         
-        public MainViewModel(ICustomerRepository customerRepository, INavigationService navigationService)
+        public MainViewModel(ICustomerRepository customerRepository, 
+            INavigationService navigationService,
+            IMessenger messenger)
         {
             _customerRepository = customerRepository ?? 
                                   throw new ArgumentNullException("customerRepository");
+            _navigationService = navigationService ?? 
+                throw new ArgumentNullException("navigationService"); 
+            _messenger = messenger ??
+                throw new ArgumentNullException("messenger");
             Customers = new ObservableCollection<CustomerViewModel>(
-                _customerRepository.Customers.Select(c => new CustomerViewModel(c)));
-            _navigationService = navigationService;
-            WeakReferenceMessenger.Default.Register<WindowClosedMessage>(this, (r, m) =>
+                _customerRepository.Customers.Select(c => new CustomerViewModel(c, messenger)));
+            messenger.Register<WindowClosedMessage>(this, (r, m) =>
             {
                 WindowCount--;
                 _openWindows.Remove(m.Value);
             });
-            WeakReferenceMessenger.Default.Register<ViewModelDeletedMessage>(this, (r, m) =>
+            messenger.Register<ViewModelDeletedMessage>(this, (r, m) =>
             {
                 DeleteCustomer(m.Value);
             });
@@ -76,7 +82,7 @@ namespace CustomerApp.ViewModel
         {
             var customer = new Customer();
             _customerRepository.Add(customer);
-            var vm = new CustomerViewModel(customer);
+            var vm = new CustomerViewModel(customer, _messenger);
             Customers.Add(vm);
             _navigationService.Navigate(vm);
         }

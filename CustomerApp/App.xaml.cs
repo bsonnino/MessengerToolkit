@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Windows;
+using CommunityToolkit.Mvvm.Messaging;
 using CustomerApp.Services;
 using CustomerApp.ViewModel;
 using CustomerLib;
@@ -27,6 +28,7 @@ namespace CustomerApp
 
             services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<ICustomerRepository, CustomerRepository>();
+            services.AddSingleton<IMessenger>(WeakReferenceMessenger.Default);
             services.AddSingleton<MainViewModel>();
 
             return services.BuildServiceProvider();
